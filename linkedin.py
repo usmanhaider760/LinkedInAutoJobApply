@@ -319,7 +319,7 @@ class Linkedin:
                 translation = translator.translate(
                     Additional_Questions.text, dest='en')
                 translated_word = translation.text
-            if ' Questions' in translated_word:
+            if ' Questions'.lower() in translated_word.lower():
                 if not os.path.exists('Q_A_File'):
                     pd.DataFrame(columns=['Question', 'Answer']).to_csv(
                         'Q_A_File', index=False)
