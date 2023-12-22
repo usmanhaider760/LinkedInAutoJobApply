@@ -178,3 +178,4 @@ angelco.py
 globalLogicCode.py
 linkedinProCode.py
 credentials.py
+*.pkl
