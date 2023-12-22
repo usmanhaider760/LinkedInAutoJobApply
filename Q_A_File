@@ -67,3 +67,5 @@ Have you conducted network tracing and engaged in low-level network debugging us
 Are you familiar with PCAP files and adept at utilizing tracing tools like Jaeger or Sentry?,Yes
 "Have you gained experience in handling low-level audio streams, such as building a recording solution capable of receiving audio streams and generating WAVE files?",Yes
 "Have you worked on transcoding audio in real-time, or dealt with protocols like WebRTC for streaming audio between backend applications?",Yes
+How many years of work experience do you have with Production Management?,10
+How many years of work experience do you have with Automation?,10

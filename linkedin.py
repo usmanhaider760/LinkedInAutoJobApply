@@ -19,6 +19,8 @@ import colorama
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import Select
 import time
+from langdetect import detect
+from googletrans import Translator
 
 
 class Linkedin:
@@ -257,8 +259,8 @@ class Linkedin:
 
     def easyApplyButton(self):
         try:
-            self.driver.get(
-                'https://www.linkedin.com/jobs/view/3791280116')
+            # self.driver.get(
+            #     'https://www.linkedin.com/jobs/view/3786700782/')
             time.sleep(random.uniform(1, constants.botSpeed))
             button = self.driver.find_element(
                 By.XPATH, "//div[contains(@class,'jobs-apply-button--top-card')]//button[contains(@class, 'jobs-apply-button')]")
@@ -273,7 +275,8 @@ class Linkedin:
         result = ""
         for pages in range(applyPages):
             self.Continue_to_next_step()
-        self.checkIfQuestionSectionExist()
+            self.checkIfQuestionSectionExist()
+            self.Continue_to_next_step()
         self.driver.find_element(
             By.CSS_SELECTOR, "button[aria-label='Review your application']").click()
         time.sleep(random.uniform(1, constants.botSpeed))
@@ -310,7 +313,13 @@ class Linkedin:
         try:
             Additional_Questions = self.driver.find_element(
                 By.XPATH, "html/body/div[3]/div/div/div[2]/div/div[2]/form/div/div/h3")
-            if 'Additional Questions' in Additional_Questions.text:
+            lang = detect(Additional_Questions.text)
+            if lang != 'en':
+                translator = Translator()
+                translation = translator.translate(
+                    Additional_Questions.text, dest='en')
+                translated_word = translation.text
+            if ' Questions' in translated_word:
                 if not os.path.exists('Q_A_File'):
                     pd.DataFrame(columns=['Question', 'Answer']).to_csv(
                         'Q_A_File', index=False)
@@ -518,8 +527,16 @@ class Linkedin:
 
     def navigate_to_person_profile(self):
         try:
-            # self.driver.get(link)
-            self.find_connectBtn_and_click()
+            try:
+                closeDonePopup = self.driver.find_element(
+                    By.XPATH, '/html/body/div[3]/div/div/div[3]/button').click()
+            except:
+                pass
+            profileLink = self.driver.find_element(
+                By.XPATH, '/html/body/div[5]/div[3]/div[2]/div/div/main/div/div[1]/div/div[2]/div/div/div[2]/a')
+            if profileLink and 'https://www.linkedin.com' in profileLink.get_attribute('href'):
+                self.driver.get(profileLink.get_attribute('href'))
+                self.find_connectBtn_and_click()
         except:
             pass
 
@@ -584,12 +601,14 @@ class Linkedin:
             address = self.driver.find_element(
                 By.XPATH, "/html/body/div[3]/div/div/div[2]/div/div[2]/form/div/div[1]/div[7]/div/div/div[1]/div/input")
             if address and address.get_attribute("type") == "text":
-                address.send_keys(
-                    'House No 230 Block C Millat Town Faisalabad, Punjab, Pakistan')
+                address.send_keys(credentials.houseAddress)
         except:
             pass
-        self.driver.find_element(
-            By.CSS_SELECTOR, "button[aria-label='Continue to next step']").click()
+        try:
+            self.driver.find_element(
+                By.CSS_SELECTOR, "button[aria-label='Continue to next step']").click()
+        except:
+            pass
 
 
 start = time.time()
