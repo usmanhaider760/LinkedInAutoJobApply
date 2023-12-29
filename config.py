@@ -19,9 +19,9 @@ chromeProfilePath = r""
 # continent locations:["Europe", "Asia", "Australia", "NorthAmerica", "SouthAmerica", "Africa", "Australia"]
 # location = ["Germany", "Austria", "France"]
 location = [
-    "United Kingdom", "Italy", "Spain", "France", "Germany",
-    "Ukraine", "Poland", "Romania", "Kazakhstan", "Netherlands", "Belgium", "Greece",
-    "Czech Republic", "Sweden", "Portugal", "Azerbaijan", "Hungary", "Belarus", "Austria",
+    "Poland", "Romania", "Kazakhstan", "Netherlands", "Belgium", "Greece",
+    "Czech Republic", "Sweden", "Portugal", "Azerbaijan", "United Kingdom", "Italy", "Spain", "France", "Germany",
+    "Ukraine", "Hungary", "Belarus", "Austria",
     "Switzerland", "Serbia", "Bulgaria", "Denmark", "Finland", "Norway", "Slovakia", "Ireland",
     "Croatia", "Georgia", "Bosnia and Herzegovina", "Armenia", "Lithuania", "Albania", "Moldova",
     "Slovenia", "North Macedonia", "Latvia", "Kosovo", "Estonia", "Cyprus", "Luxembourg",

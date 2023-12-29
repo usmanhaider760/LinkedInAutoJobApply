@@ -23,6 +23,7 @@ from langdetect import detect
 from googletrans import Translator
 import csv
 from datetime import datetime
+import pyautogui
 
 
 class Linkedin:
@@ -42,14 +43,23 @@ class Linkedin:
             utils.prGreen(
                 "                           ✅ Trying to log in Linkedin...")
             try:
-                self.driver.find_element(
-                    "id", "username").send_keys(credentials.email)
+                try:
+                    self.driver.find_element(
+                        "id", "username").send_keys(credentials.email)
+                except:
+                    pass
                 # time.sleep(2)
-                self.driver.find_element(
-                    "id", "password").send_keys(credentials.password)
+                try:
+                    self.driver.find_element(
+                        "id", "password").send_keys(credentials.password)
+                except:
+                    pass
                 # time.sleep(2)
-                self.driver.find_element(
-                    "xpath", '//button[@type="submit"]').click()
+                try:
+                    self.click_using_mouse_move(self.driver.find_element(
+                        "xpath", '//button[@type="submit"]'))
+                except:
+                    pass
                 time.sleep(10)
             except:
                 utils.prRed(
@@ -140,67 +150,71 @@ class Linkedin:
                     for jobID in offerIds:
                         offerPage = 'https://www.linkedin.com/jobs/view/' + \
                             str(jobID)
-                        self.driver.get(offerPage)
-                        time.sleep(random.uniform(1, constants.botSpeed))
+                        if not self.isUrlExist(offerPage):
+                            self.driver.get(offerPage)
+                            time.sleep(random.uniform(1, constants.botSpeed))
 
-                        countJobs += 1
+                            countJobs += 1
 
-                        jobProperties = self.getJobProperties(countJobs)
-                        if "blacklisted" in jobProperties:
-                            lineToWrite = '✅ '+jobProperties + " | " + \
-                                "*                            🤬 Blacklisted Job, skipped!: "  \
-                                + str(offerPage)
-                            self.displayWriteResults(lineToWrite)
-
-                        else:
-                            easyApplybutton = self.easyApplyButton()
-
-                            if easyApplybutton is not False:
-                                easyApplybutton.click()
-                                time.sleep(random.uniform(
-                                    1, constants.botSpeed))
-                                countApplied += 1
-                                try:
-                                    self.chooseResume()
-                                    self.driver.find_element(
-                                        By.CSS_SELECTOR, "button[aria-label='Submit application']").click()
-                                    time.sleep(random.uniform(
-                                        1, constants.botSpeed))
-
-                                    lineToWrite = "🥳 Just Applied to this job: "  \
-                                        + str(offerPage)
-                                    self.check_and_update_job_link_csv(
-                                        offerPage, self.csv_link_job_file, True)
-                                    self.displayWriteResults(lineToWrite)
-
-                                except:
-                                    try:
-                                        self.Continue_to_next_step()
-                                        time.sleep(random.uniform(
-                                            1, constants.botSpeed))
-                                        self.chooseResume()
-                                        comPercentage = self.driver.find_element(
-                                            By.XPATH, 'html/body/div[3]/div/div/div[2]/div/div/span').text
-                                        percenNumber = int(
-                                            comPercentage[0:comPercentage.index("%")])
-                                        result = self.applyProcess(
-                                            percenNumber, offerPage)
-                                        lineToWrite = '✅ '+jobProperties + " | " + result
-                                        self.displayWriteResults(lineToWrite)
-
-                                    except Exception:
-                                        self.chooseResume()
-                                        lineToWrite = "🥵 Cannot apply to this Job! " \
-                                            + str(offerPage)
-                                        self.check_and_update_job_link_csv(
-                                            offerPage, self.csv_link_job_file, False)
-                                        self.displayWriteResults(lineToWrite)
-                            else:
+                            jobProperties = self.getJobProperties(countJobs)
+                            if "blacklisted" in jobProperties:
                                 lineToWrite = '✅ '+jobProperties + " | " + \
-                                    "*                            🥳 Already applied! Job: "  \
+                                    "*                            🤬 Blacklisted Job, skipped!: "  \
                                     + str(offerPage)
                                 self.displayWriteResults(lineToWrite)
-                        self.navigate_to_person_profile()
+
+                            else:
+                                easyApplybutton = self.easyApplyButton()
+
+                                if easyApplybutton is not False:
+                                    self.click_using_mouse_move(
+                                        easyApplybutton)
+                                    time.sleep(random.uniform(
+                                        1, constants.botSpeed))
+                                    countApplied += 1
+                                    try:
+                                        self.chooseResume()
+                                        self.click_using_mouse_move(self.driver.find_element(
+                                            By.CSS_SELECTOR, "button[aria-label='Submit application']"))
+                                        time.sleep(random.uniform(
+                                            1, constants.botSpeed))
+
+                                        lineToWrite = "🥳 Just Applied to this job: "  \
+                                            + str(offerPage)
+                                        self.check_and_update_job_link_csv(
+                                            offerPage, self.csv_link_job_file, True)
+                                        self.displayWriteResults(lineToWrite)
+
+                                    except:
+                                        try:
+                                            self.Continue_to_next_step()
+                                            time.sleep(random.uniform(
+                                                1, constants.botSpeed))
+                                            self.chooseResume()
+                                            comPercentage = self.driver.find_element(
+                                                By.XPATH, 'html/body/div[3]/div/div/div[2]/div/div/span').text
+                                            percenNumber = int(
+                                                comPercentage[0:comPercentage.index("%")])
+                                            result = self.applyProcess(
+                                                percenNumber, offerPage)
+                                            lineToWrite = '✅ '+jobProperties + " | " + result
+                                            self.displayWriteResults(
+                                                lineToWrite)
+
+                                        except Exception:
+                                            self.chooseResume()
+                                            lineToWrite = "🥵 Cannot apply to this Job! " \
+                                                + str(offerPage)
+                                            self.check_and_update_job_link_csv(
+                                                offerPage, self.csv_link_job_file, False)
+                                            self.displayWriteResults(
+                                                lineToWrite)
+                                else:
+                                    lineToWrite = '✅ '+jobProperties + " | " + \
+                                        "*                            🥳 Already applied! Job: "  \
+                                        + str(offerPage)
+                                    self.displayWriteResults(lineToWrite)
+                            self.navigate_to_person_profile()
 
                 utils.prYellow("✅  Category: " + urlWords[0] + "," + urlWords[1] + " applied: " + str(countApplied) +
                                " jobs out of " + str(countJobs) + ".")
@@ -212,9 +226,9 @@ class Linkedin:
             resumes = self.driver.find_elements(
                 By.XPATH, "//div[contains(@class, 'ui-attachment--pdf')]")
             if (len(resumes) == 1 and resumes[0].get_attribute("aria-label") == "Select this resume"):
-                resumes[0].click()
+                self.click_using_mouse_move(resumes[0])
             elif (len(resumes) > 1 and resumes[config.preferredCv-1].get_attribute("aria-label") == "Select this resume"):
-                resumes[config.preferredCv-1].click()
+                self.click_using_mouse_move(resumes[config.preferredCv-1])
             elif (type(len(resumes)) != int):
                 utils.prRed(
                     "                           ❌ No resume has been selected please add at least one resume to your Linkedin account.")
@@ -240,7 +254,7 @@ class Linkedin:
             jobTitle = ""
 
         try:
-            time.sleep(5)
+            time.sleep(random.uniform(3, 5))
             jobDetail = self.driver.find_element(
                 By.XPATH, "//div[contains(@class, 'job-details-jobs')]//div").text.replace("·", "|")
             res = [blItem for blItem in config.blacklistCompanies if (
@@ -291,8 +305,8 @@ class Linkedin:
             self.Continue_to_next_step()
             self.checkIfQuestionSectionExist()
             self.Continue_to_next_step()
-        self.driver.find_element(
-            By.CSS_SELECTOR, "button[aria-label='Review your application']").click()
+        self.click_using_mouse_move(self.driver.find_element(
+            By.CSS_SELECTOR, "button[aria-label='Review your application']"))
         time.sleep(random.uniform(1, constants.botSpeed))
 
         if config.followCompanies is False:
@@ -300,14 +314,14 @@ class Linkedin:
                 checkbox = self.driver.find_element(
                     By.ID, "follow-company-checkbox")
                 if not checkbox.is_selected():
-                    checkbox.click()
-                # self.driver.find_element(
-                #     By.CSS_SELECTOR, "label[for='follow-company-checkbox']").click()
+                    self.click_using_mouse_move(checkbox)
+                # self.click_using_mouse_move(self.driver.find_element(
+                #     By.CSS_SELECTOR, "label[for='follow-company-checkbox']"))
             except:
                 pass
 
-        self.driver.find_element(
-            By.CSS_SELECTOR, "button[aria-label='Submit application']").click()
+        self.click_using_mouse_move(self.driver.find_element(
+            By.CSS_SELECTOR, "button[aria-label='Submit application']"))
         time.sleep(random.uniform(1, constants.botSpeed))
 
         result = "*                            🥳 Just Applied to this job: "  \
@@ -333,7 +347,7 @@ class Linkedin:
                 translation = translator.translate(
                     Additional_Questions.text, dest='en')
                 translated_word = translation.text
-            if ' Questions'.lower() in translated_word.lower():
+            if (' Questions'.lower() in translated_word.lower()) or 'Additional'.lower() in translated_word.lower():
                 if not os.path.exists('Q_A_File'):
                     pd.DataFrame(columns=['Question', 'Answer']).to_csv(
                         'Q_A_File', index=False)
@@ -350,8 +364,7 @@ class Linkedin:
                     By.XPATH, '/html/body/div[3]/div/div/div[2]/div/div[2]/form/div/div/div[8]/div/fieldset/div/input')
                 if chkAgree and chkAgree.get_attribute("type") == "checkbox":
                     if not chkAgree.is_selected():
-                        self.driver.execute_script(
-                            'arguments[0].click();', chkAgree)
+                        self.click_using_mouse_move(chkAgree, 1)
 
             except:
                 pass
@@ -420,11 +433,10 @@ class Linkedin:
                             # Hover over the radio input to make it visible and clickable
                             ActionChains(self.driver).move_to_element(
                                 radio_input).perform()
-                            time.sleep(0.5)  # Add a small delay
+                            time.sleep(random.uniform(.2, .6))
 
                             if label_for_radio.text.strip() in answer:
-                                self.driver.execute_script(
-                                    "arguments[0].click();", radio_input)
+                                self.click_using_mouse_move(radio_input, 1)
                                 return True
 
                         except Exception as e:
@@ -474,15 +486,16 @@ class Linkedin:
 
     def isSelectionQuestion(self, question_element, index):
         try:
-            questions_and_answers = self.read_questions_and_answers()
+            questions_and_answers = self.read_questions_and_answers_GroupBy()
             questionLabel = question_element.find_element(
                 By.CSS_SELECTOR, 'span[aria-hidden="true"]')
             question_text = questionLabel.text
-            if question_text in questions_and_answers:
-                answer = questions_and_answers[question_text]
+            answer = self.checkSelection_options_answers(
+                question_text, questions_and_answers, question_element)
+            if answer is not None:
                 select_element = question_element.find_element(
                     By.TAG_NAME, 'select')
-                select_element.click()
+                self.click_using_mouse_move(select_element)
                 select = Select(select_element)
                 desired_value = answer
                 for option in select.options:
@@ -490,27 +503,111 @@ class Linkedin:
                         select.select_by_value(desired_value)
                         return True
             else:
-                self.answer_Not_Found(question_text)
+                self.answer_Not_Found(question_text, question_element)
                 self.isSelectionQuestion(question_element, index)
+
         except Exception as e:
             utils.prRed("❌ Error in Selection: " + str(e))
             return False
 
-    def answer_Not_Found(self, question):
-        user_input = input(question)
+    def checkSelection_options_answers(self, question_text, questions_and_answers, question_element=None):
+        matchedAns = None
+        if question_element is not None:
+            select_element = question_element.find_element(
+                By.TAG_NAME, 'select')
+            self.click_using_mouse_move(select_element)
+            select = Select(select_element)
+            matching_rows = questions_and_answers.get(question_text, [])
+            for answerRow in matching_rows:
+                if matchedAns is None:
+                    for option in select.options:
+                        if matchedAns is None:
+                            if option.get_attribute("value") == answerRow:
+                                matchedAns = answerRow
+                                break
+                        else:
+                            break
+                else:
+                    break
+
+        return matchedAns
+
+    def answer_Not_Found(self, question, question_element=None):
+        lang = detect(question)
+        if lang != 'en':
+            translator = Translator()
+            translation = translator.translate(question, dest='en')
+            translated_word = translation.text
+        else:
+            # If the language is already English, use the original question
+            translated_word = question
+        if question_element is not None:
+            select_element = question_element.find_element(
+                By.TAG_NAME, 'select')
+            self.click_using_mouse_move(select_element)
+            select = Select(select_element)
+            answer_Options = None
+            answer_Options = ', '.join(option.get_attribute(
+                "value") for option in select.options)
+            utils.prYellow(answer_Options)
+        _input = 'Question: ' + translated_word + '\n'
+        user_input = input(f"\033[92m{_input}\033[00m")
         processed_output = f"{user_input}"
-        existing_df = pd.read_csv('Q_A_File')
+        # Corrected file extension to '.csv'
+        existing_df = pd.read_csv(
+            'Q_A_File', encoding='utf-8', na_values=['None'])
         new_data = {'Question': [question], 'Answer': [processed_output]}
         new_df = pd.DataFrame(new_data)
         updated_df = pd.concat([existing_df, new_df], ignore_index=True)
+        # Corrected file extension to '.csv'
         updated_df.to_csv('Q_A_File', index=False)
+
+    def isUrlExist(self, jobUrl):
+        job_urls_file = 'job_urls.txt'
+        # 1. Check if job_urls file exists, create if not
+        if not os.path.exists(job_urls_file):
+            with open(job_urls_file, 'w') as file:
+                pass  # Create an empty file if it doesn't exist
+        # 2. Check if a URL exists
+        with open(job_urls_file, 'r') as file:
+            existing_urls = file.read().splitlines()
+            if jobUrl in existing_urls:
+                return True
+        # 3. If the URL doesn't exist, write it to the file
+
+        with open(job_urls_file, 'a') as file:
+            file.write(jobUrl + '\n')
+            return False
+
+    def write_Job_Url(self, jobUrl):
+        job_urls_file = 'job_urls.txt'
+        # 1. Check if job_urls file exists, create if not
+        if not os.path.exists(job_urls_file):
+            with open(job_urls_file, 'w') as file:
+                pass  # Create an empty file if it doesn't exist
+        with open(job_urls_file, 'a') as file:
+            file.write(jobUrl + '\n')
+            return False
 
     def read_questions_and_answers(self):
         try:
-            data = pd.read_csv('Q_A_File')
+            data = pd.read_csv('Q_A_File', encoding='utf-8',
+                               na_values=['None'])
             questions = data['Question'].tolist()
             answers = data['Answer'].tolist()
             return dict(zip(questions, answers))
+        except FileNotFoundError:
+            return {}
+
+    def read_questions_and_answers_GroupBy(self):
+        try:
+            data = pd.read_csv('Q_A_File', encoding='utf-8',
+                               na_values=['None'])
+            grouped_data = data.groupby(
+                'Question')['Answer'].apply(list).reset_index()
+            questions_and_answers = dict(
+                zip(grouped_data['Question'], grouped_data['Answer']))
+            return questions_and_answers
         except FileNotFoundError:
             return {}
 
@@ -531,8 +628,8 @@ class Linkedin:
     def navigate_to_person_profile(self):
         found = True
         try:
-            closeDonePopup = self.driver.find_element(
-                By.XPATH, '/html/body/div[3]/div/div/div[3]/button').click()
+            closeDonePopup = self.click_using_mouse_move(self.driver.find_element(
+                By.XPATH, '/html/body/div[3]/div/div/div[3]/button'))
         except:
             pass
 
@@ -578,11 +675,11 @@ class Linkedin:
             btnConnect = self.wait.until(EC.element_to_be_clickable(
                 (By.XPATH, '/html/body/div[5]/div[3]/div/div/div[2]/div/div/main/section[1]/div[2]/div[3]/div/button')))
             if btnConnect and btnConnect.text == 'Connect':
-                btnConnect.click()
+                self.click_using_mouse_move(btnConnect)
                 found = True
             else:
                 if btnConnect and btnConnect.text == 'Follow':
-                    btnConnect.click()
+                    self.click_using_mouse_move(btnConnect)
                 found = False
         except Exception as e:
             print(str(e))
@@ -594,15 +691,13 @@ class Linkedin:
                 btnMore = self.driver.find_element(
                     By.XPATH, '/html/body/div[5]/div[3]/div/div/div[2]/div/div/main/section[1]/div[2]/div[3]/div/div[2]/button')
                 if btnMore:
-                    time.sleep(1)
-                    self.driver.execute_script(
-                        "arguments[0].click();", btnMore)
-                    time.sleep(1)
+                    time.sleep(random.uniform(.7, 1))
+                    self.click_using_mouse_move(btnMore, 1)
+                    time.sleep(random.uniform(.7, 1))
                     btnConnect = self.driver.find_element(
                         By.XPATH, '/html/body/div[5]/div[3]/div/div/div[2]/div/div/main/section[1]/div[2]/div[3]/div/div[2]/div/div/ul/li[3]/div')
                     if btnConnect:
-                        self.driver.execute_script(
-                            "arguments[0].click();", btnConnect)
+                        self.click_using_mouse_move(btnConnect, 1)
                         found = True
             except Exception as e:
                 pefoundrf = False
@@ -613,20 +708,19 @@ class Linkedin:
                 btnSecondConnect = self.driver.find_element(
                     By.XPATH, '/html/body/div[5]/div[3]/div/div/div[2]/div/div/main/section[1]/div[2]/div[3]/div/button')
                 if btnSecondConnect:
-                    time.sleep(1)
-                    self.driver.execute_script(
-                        "arguments[0].click();", btnSecondConnect)
-                    time.sleep(1)
+                    time.sleep(random.uniform(.7, 1))
+                    self.click_using_mouse_move(btnSecondConnect, 1)
+                    time.sleep(random.uniform(.7, 1))
                     found = True
             except Exception as e:
                 pefoundrf = False
                 print(str(e))
                 pass
-        time.sleep(2)
+        time.sleep(random.uniform(1.5, 2))
         if found:
             self.send_connection_request()
         else:
-            found=False
+            found = False
 
     def send_connection_request(self):
         try:
@@ -642,8 +736,8 @@ class Linkedin:
         send_without_a_note = self.driver.find_element(
             By.XPATH, '/html/body/div[3]/div/div/div[3]/button[2]')
         if send_without_a_note and send_without_a_note.text == 'Send without a note':
-            send_without_a_note.click()
-        time.sleep(2)
+            self.click_using_mouse_move(send_without_a_note)
+        time.sleep(random.uniform(1.5, 2))
 
     def Continue_to_next_step(self):
         try:
@@ -654,8 +748,8 @@ class Linkedin:
         except:
             pass
         try:
-            self.driver.find_element(
-                By.CSS_SELECTOR, "button[aria-label='Continue to next step']").click()
+            self.click_using_mouse_move(self.driver.find_element(
+                By.CSS_SELECTOR, "button[aria-label='Continue to next step']"))
         except:
             pass
 
@@ -685,7 +779,6 @@ class Linkedin:
 
     def check_and_update_job_link_csv(self, link, csv_filename, status):
         found = True
-
         # Check if the CSV file exists
         if not os.path.exists(csv_filename):
             # If the CSV file doesn't exist, create it with the header
@@ -706,7 +799,24 @@ class Linkedin:
                 found = False
         else:
             found = True
+        self.write_Job_Url(link)
         return found
+
+    def click_using_mouse_move(self, element, isscript=0):
+        location = element.location
+        size = element.size
+        # Calculate the coordinates of the center of the element
+        x = location['x'] + size['width'] // 2
+        y = location['y'] + size['height'] // 2
+        pyautogui.moveTo(x, y, duration=random.uniform(.4, .8))
+        if isscript == 0:
+            # pyautogui.click()
+            time.sleep(random.uniform(.3, .5))
+            element.click()
+        else:
+            time.sleep(random.uniform(.3, .5))
+            self.driver.execute_script(
+                "arguments[0].click();", element)
 
 
 start = time.time()
