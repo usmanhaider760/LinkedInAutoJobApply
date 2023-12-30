@@ -24,6 +24,7 @@ from googletrans import Translator
 import csv
 from datetime import datetime
 import pyautogui
+from connection_request import ConnectionRequest
 
 
 class Linkedin:
@@ -37,6 +38,8 @@ class Linkedin:
         self.WebDriverWait = WebDriverWait
         self.csv_link_profile_file = 'profile_links.csv'
         self.csv_link_job_file = f'job_links_{self.today_date}.csv'
+        self.connection_request_instance = ConnectionRequest(self.driver)
+        pyautogui.FAILSAFE = False
         if not self.isLoggedIn():
             self.driver.get(
                 "https://www.linkedin.com/login?trk=guest_homepage-basic_nav-header-signin")
@@ -662,82 +665,11 @@ class Linkedin:
                 if profileLink and 'https://www.linkedin.com' in profileLink.get_attribute('href'):
                     if not self.check_and_update_profile_link_csv(
                             profileLink.get_attribute('href'), self.csv_link_profile_file):
-                        self.driver.get(profileLink.get_attribute('href'))
-                        self.find_connectBtn_and_click()
-
+                        profileurl = profileLink.get_attribute('href')
+                        self.driver.get(profileurl)
+                        self.connection_request_instance.find_follow_and_connect()
             except:
                 pass
-
-    def find_connectBtn_and_click(self):
-
-        found = True
-        try:
-            btnConnect = self.wait.until(EC.element_to_be_clickable(
-                (By.XPATH, '/html/body/div[5]/div[3]/div/div/div[2]/div/div/main/section[1]/div[2]/div[3]/div/button')))
-            if btnConnect and btnConnect.text == 'Connect':
-                self.click_using_mouse_move(btnConnect)
-                found = True
-            else:
-                if btnConnect and btnConnect.text == 'Follow':
-                    self.click_using_mouse_move(btnConnect)
-                found = False
-        except Exception as e:
-            print(str(e))
-            found = False
-            pass
-
-        if not found:
-            try:
-                btnMore = self.driver.find_element(
-                    By.XPATH, '/html/body/div[5]/div[3]/div/div/div[2]/div/div/main/section[1]/div[2]/div[3]/div/div[2]/button')
-                if btnMore:
-                    time.sleep(random.uniform(.7, 1))
-                    self.click_using_mouse_move(btnMore, 1)
-                    time.sleep(random.uniform(.7, 1))
-                    btnConnect = self.driver.find_element(
-                        By.XPATH, '/html/body/div[5]/div[3]/div/div/div[2]/div/div/main/section[1]/div[2]/div[3]/div/div[2]/div/div/ul/li[3]/div')
-                    if btnConnect:
-                        self.click_using_mouse_move(btnConnect, 1)
-                        found = True
-            except Exception as e:
-                pefoundrf = False
-                print(str(e))
-                pass
-        if not found:
-            try:
-                btnSecondConnect = self.driver.find_element(
-                    By.XPATH, '/html/body/div[5]/div[3]/div/div/div[2]/div/div/main/section[1]/div[2]/div[3]/div/button')
-                if btnSecondConnect:
-                    time.sleep(random.uniform(.7, 1))
-                    self.click_using_mouse_move(btnSecondConnect, 1)
-                    time.sleep(random.uniform(.7, 1))
-                    found = True
-            except Exception as e:
-                pefoundrf = False
-                print(str(e))
-                pass
-        time.sleep(random.uniform(1.5, 2))
-        if found:
-            self.send_connection_request()
-        else:
-            found = False
-
-    def send_connection_request(self):
-        try:
-            To_verify_this_member_knows_you = self.driver.find_element(
-                By.XPATH, '/html/body/div[3]/div/div/div[2]/label')
-            if To_verify_this_member_knows_you and 'To verify this member knows you, please enter their email to connect' in To_verify_this_member_knows_you.text:
-                txta = self.driver.find_element(
-                    By.XPATH, '/html/body/div[3]/div/div/div[2]/label/input')
-                if txta:
-                    txta.send_keys('usmanhaider760@gmail.com')
-        except:
-            pass
-        send_without_a_note = self.driver.find_element(
-            By.XPATH, '/html/body/div[3]/div/div/div[3]/button[2]')
-        if send_without_a_note and send_without_a_note.text == 'Send without a note':
-            self.click_using_mouse_move(send_without_a_note)
-        time.sleep(random.uniform(1.5, 2))
 
     def Continue_to_next_step(self):
         try:
@@ -808,7 +740,11 @@ class Linkedin:
         # Calculate the coordinates of the center of the element
         x = location['x'] + size['width'] // 2
         y = location['y'] + size['height'] // 2
-        pyautogui.moveTo(x, y, duration=random.uniform(.4, .8))
+        try:
+            pyautogui.moveTo(x, y, duration=random.uniform(.4, .8))
+        except:
+            pass
+
         if isscript == 0:
             # pyautogui.click()
             time.sleep(random.uniform(.3, .5))
