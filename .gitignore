@@ -165,8 +165,7 @@ pytransform/
 #config file
 mainConfig.py
 
-#testing file
-test.py
+
 
 # user files
 geckodriver.log
