@@ -25,6 +25,7 @@ import csv
 from datetime import datetime
 import pyautogui
 from connection_request import ConnectionRequest
+from selenium.common.exceptions import NoSuchElementException
 
 
 class Linkedin:
@@ -44,7 +45,7 @@ class Linkedin:
             self.driver.get(
                 "https://www.linkedin.com/login?trk=guest_homepage-basic_nav-header-signin")
             utils.prGreen(
-                "                           ✅ Trying to log in Linkedin...")
+                "✅ Trying to log in Linkedin...")
             try:
                 try:
                     self.driver.find_element(
@@ -66,7 +67,7 @@ class Linkedin:
                 time.sleep(10)
             except:
                 utils.prRed(
-                    "                           ❌ Couldn't log in Linkedin by using Chrome. Please check your Linkedin credentials on config files line 7 and 8.")
+                    "❌ Couldn't log in Linkedin by using Chrome. Please check your Linkedin credentials on config files line 7 and 8.")
 
             self.saveCookies()
         # start application
@@ -106,10 +107,10 @@ class Linkedin:
                 for url in linkedinJobLinks:
                     file.write(url + "\n")
             utils.prGreen(
-                "                           ✅ Apply urls are created successfully, now the bot will visit those urls.")
+                "✅ Apply urls are created successfully, now the bot will visit those urls.")
         except:
             utils.prRed(
-                "                           ❌ Couldn't generate urls, make sure you have editted config file line 25-39")
+                "❌ Couldn't generate urls, make sure you have editted config file line 25-39")
 
     def linkJobApply(self):
         self.generateUrls()
@@ -133,7 +134,7 @@ class Linkedin:
 
             if not totalJobs == None and not totalPages == None:
                 urlWords = utils.urlToKeywords(url)
-                lineToWrite = "\n                            ✅ Category: " + \
+                lineToWrite = "\n✅ Category: " + \
                     urlWords[0] + ", Location: " + urlWords[1] + \
                     ", Applying " + str(totalJobs) + " jobs."
                 self.displayWriteResults(lineToWrite)
@@ -143,9 +144,15 @@ class Linkedin:
                     url = url + "&start=" + str(currentPageJobs)
                     self.driver.get(url)
                     time.sleep(random.uniform(1, constants.botSpeed))
-
-                    offersPerPage = self.driver.find_elements(
+                    offersPerPage = []
+                    offersPerPageFilter = self.driver.find_elements(
                         By.XPATH, '//li[@data-occludable-job-id]')
+                    for li_element in offersPerPageFilter:
+                        try:
+                            li_element.find_element(
+                                By.XPATH, './/span[contains(text(), "Applied")]')
+                        except NoSuchElementException:
+                            offersPerPage.append(li_element)
                     offerIds = [(offer.get_attribute(
                         "data-occludable-job-id").split(":")[-1]) for offer in offersPerPage]
                     time.sleep(random.uniform(1, constants.botSpeed))
@@ -234,7 +241,7 @@ class Linkedin:
                 self.click_using_mouse_move(resumes[config.preferredCv-1])
             elif (type(len(resumes)) != int):
                 utils.prRed(
-                    "                           ❌ No resume has been selected please add at least one resume to your Linkedin account.")
+                    "❌ No resume has been selected please add at least one resume to your Linkedin account.")
         except:
             pass
 
@@ -253,7 +260,7 @@ class Linkedin:
         except Exception as e:
             if (config.displayWarnings):
                 utils.prYellow(
-                    "                           ⚠️ Warning in getting jobTitle: " + str(e)[0:50])
+                    "⚠️ Warning in getting jobTitle: " + str(e)[0:50])
             jobTitle = ""
 
         try:
@@ -268,7 +275,7 @@ class Linkedin:
             if (config.displayWarnings):
                 print(e)
                 utils.prYellow(
-                    "                           ⚠️ Warning in getting jobDetail: " + str(e)[0:100])
+                    "⚠️ Warning in getting jobDetail: " + str(e)[0:100])
             jobDetail = ""
 
         try:
@@ -281,7 +288,7 @@ class Linkedin:
             if (config.displayWarnings):
                 print(e)
                 utils.prYellow(
-                    "                           ⚠️ Warning in getting jobLocation: " + str(e)[0:100])
+                    "⚠️ Warning in getting jobLocation: " + str(e)[0:100])
             jobLocation = ""
 
         textToWrite = str(count) + " | " + jobTitle + \
@@ -338,7 +345,7 @@ class Linkedin:
             utils.writeResults(lineToWrite)
         except Exception as e:
             utils.prRed(
-                "                           ❌ Error in DisplayWriteResults: " + str(e))
+                "❌ Error in DisplayWriteResults: " + str(e))
 
     def checkIfQuestionSectionExist(self):  # check if question exist
         try:
@@ -374,7 +381,7 @@ class Linkedin:
 
         except Exception as e:
             utils.prRed(
-                "                           ❌ Error in DisplayWriteResults: " + str(e))
+                "❌ Error in DisplayWriteResults: " + str(e))
 
     def answerThe_Question(self, question_element, index):
         try:
