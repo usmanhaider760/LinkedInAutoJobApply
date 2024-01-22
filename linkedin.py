@@ -419,7 +419,7 @@ class Linkedin:
             pass
 
     def isRadioQuestion(self, fieldset, index):
-        questions_and_answers = self.read_questions_and_answers()
+        questions_and_answers = self.read_questions_and_answers(2)
         try:
             question_span = WebDriverWait(fieldset, 10).until(
                 EC.presence_of_element_located(
@@ -453,7 +453,7 @@ class Linkedin:
                             utils.prRed(
                                 "❌ Error in Radio Button Check: " + str(e))
             else:
-                self.answer_Not_Found(question_text)
+                self.answer_Not_Found(question_text, 2)
                 self.isRadioQuestion(fieldset, index)
             return False
 
@@ -463,7 +463,7 @@ class Linkedin:
 
     def isTextBoxQuestion(self, question_element, index):
         try:
-            questions_and_answers = self.read_questions_and_answers()
+            questions_and_answers = self.read_questions_and_answers(1)
 
             # Wait for the question label to be present
             question_label = WebDriverWait(question_element, 10).until(
@@ -487,7 +487,7 @@ class Linkedin:
                         input_ans.send_keys(answer)
                         return True
             else:
-                self.answer_Not_Found(question_text)
+                self.answer_Not_Found(question_text, 1)
                 self.isTextBoxQuestion(question_element, index)
 
         except Exception as e:
@@ -513,7 +513,7 @@ class Linkedin:
                         select.select_by_value(desired_value)
                         return True
             else:
-                self.answer_Not_Found(question_text, question_element)
+                self.answer_Not_Found(question_text, 3, question_element)
                 self.isSelectionQuestion(question_element, index)
 
         except Exception as e:
@@ -542,8 +542,8 @@ class Linkedin:
 
         return matchedAns
 
-    def answer_Not_Found(self, question, question_element=None):
-        lang = detect(question)
+    def answer_Not_Found(self, question, FieldType, question_element=None):
+        lang = detect()
         if lang != 'en':
             translator = Translator()
             translation = translator.translate(question, dest='en')
@@ -560,13 +560,22 @@ class Linkedin:
             answer_Options = ', '.join(option.get_attribute(
                 "value") for option in select.options)
             utils.prYellow(answer_Options)
-        _input = 'Question: ' + translated_word + '\n'
+
+        questionText = 'Question in English\n' + translated_word
+        if translated_word != question:
+            questionText = questionText + '\nQuestion in Other Language\n' + question
+        _input = questionText + '\n'
         user_input = input(f"\033[92m{_input}\033[00m")
         processed_output = f"{user_input}"
-        # Corrected file extension to '.csv'
+
+        separated_values = processed_output.split(', ')
+
+        finalQuestion = separated_values[0]
+        finalAns = separated_values[0]
         existing_df = pd.read_csv(
             'Q_A_File', encoding='utf-8', na_values=['None'])
-        new_data = {'Question': [question], 'Answer': [processed_output]}
+        new_data = {'Question': [finalQuestion], 'Answer': [
+            finalAns], 'FieldType': [FieldType]}
         new_df = pd.DataFrame(new_data)
         updated_df = pd.concat([existing_df, new_df], ignore_index=True)
         # Corrected file extension to '.csv'
@@ -599,20 +608,24 @@ class Linkedin:
             file.write(jobUrl + '\n')
             return False
 
-    def read_questions_and_answers(self):
+    def read_questions_and_answers(self, FieldType):
+        # FieldType TextBox=1,Radio=2,Dropdown=3
         try:
-            data = pd.read_csv('Q_A_File', encoding='utf-8',
-                               na_values=['None'])
+            All_data = pd.read_csv('Q_A_File', encoding='utf-8',
+                                   na_values=['None'])
+            data = All_data[All_data['FieldType'] == FieldType]
             questions = data['Question'].tolist()
             answers = data['Answer'].tolist()
-            return dict(zip(questions, answers))
+            FieldType = data['FieldType'].tolist()
+            return dict(zip(questions, answers, FieldType))
         except FileNotFoundError:
             return {}
 
     def read_questions_and_answers_GroupBy(self):
         try:
-            data = pd.read_csv('Q_A_File', encoding='utf-8',
-                               na_values=['None'])
+            All_data = pd.read_csv('Q_A_File', encoding='utf-8',
+                                   na_values=['None'])
+            data = All_data[All_data['FieldType'] == 3]
             grouped_data = data.groupby(
                 'Question')['Answer'].apply(list).reset_index()
             questions_and_answers = dict(
