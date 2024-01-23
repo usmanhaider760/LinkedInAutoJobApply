@@ -167,7 +167,7 @@ class Linkedin:
                             countJobs += 1
 
                             jobProperties = self.getJobProperties(countJobs)
-                            if "blacklisted" in jobProperties:
+                            if "Noir" in jobProperties:
                                 lineToWrite = '✅ '+jobProperties + " | " + \
                                     "*                            🤬 Blacklisted Job, skipped!: "  \
                                     + str(offerPage)
@@ -427,8 +427,9 @@ class Linkedin:
             )
             question_text = question_span.text.strip()
 
-            if question_text and question_text in questions_and_answers:
-                answer = questions_and_answers[question_text]
+            if question_text:
+                answer = self.find_answer_from_csv(
+                    questions_and_answers, question_text)
                 if answer:
                     radio_inputs = WebDriverWait(fieldset, 10).until(
                         EC.presence_of_all_elements_located(
@@ -464,31 +465,25 @@ class Linkedin:
     def isTextBoxQuestion(self, question_element, index):
         try:
             questions_and_answers = self.read_questions_and_answers(1)
-
-            # Wait for the question label to be present
             question_label = WebDriverWait(question_element, 10).until(
                 EC.presence_of_element_located(
                     (By.CSS_SELECTOR, 'label.artdeco-text-input--label'))
             )
-
             question_text = question_label.text.strip()
-            if question_text in questions_and_answers:
-                # Wait for the input element to be present
-                input_ans = WebDriverWait(question_element, 10).until(
-                    EC.presence_of_element_located(
-                        (By.CSS_SELECTOR, 'input[type="text"]'))
-                )
-
-                if input_ans:
-                    input_ans_value = input_ans.get_attribute("value")
-
-                    if input_ans_value is None or input_ans_value == "0" or input_ans_value.strip() == '':
-                        answer = questions_and_answers[question_text]
-                        input_ans.send_keys(answer)
-                        return True
-            else:
-                self.answer_Not_Found(question_text, 1)
-                self.isTextBoxQuestion(question_element, index)
+            if question_text:
+                answer = self.find_answer_from_csv(
+                    questions_and_answers, question_text)
+                if answer:
+                    input_ans = WebDriverWait(question_element, 10).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR, 'input[type="text"]')))
+                    if input_ans:
+                        input_ans_value = input_ans.get_attribute("value")
+                        if input_ans_value is None or input_ans_value == "0" or input_ans_value.strip() == '':
+                            input_ans.send_keys(answer)
+                            return True
+                else:
+                    self.answer_Not_Found(question_text, 1)
+                    self.isTextBoxQuestion(question_element, index)
 
         except Exception as e:
             utils.prRed("❌ Error in isTextBoxQuestion: " + str(e))
@@ -527,23 +522,18 @@ class Linkedin:
                 By.TAG_NAME, 'select')
             self.click_using_mouse_move(select_element)
             select = Select(select_element)
-            matching_rows = questions_and_answers.get(question_text, [])
-            for answerRow in matching_rows:
-                if matchedAns is None:
-                    for option in select.options:
-                        if matchedAns is None:
-                            if option.get_attribute("value") == answerRow:
-                                matchedAns = answerRow
-                                break
-                        else:
+            answer = self.find_answer_from_csv(
+                questions_and_answers, question_text)
+            if answer:
+                for option in select.options:
+                    if matchedAns is None:
+                        if option.get_attribute("value") == answer:
+                            matchedAns = answer
                             break
-                else:
-                    break
-
         return matchedAns
 
     def answer_Not_Found(self, question, FieldType, question_element=None):
-        lang = detect()
+        lang = detect(question)
         if lang != 'en':
             translator = Translator()
             translation = translator.translate(question, dest='en')
@@ -568,10 +558,10 @@ class Linkedin:
         user_input = input(f"\033[92m{_input}\033[00m")
         processed_output = f"{user_input}"
 
-        separated_values = processed_output.split(', ')
+        separated_values = processed_output.split(',')
 
         finalQuestion = separated_values[0]
-        finalAns = separated_values[0]
+        finalAns = separated_values[1]
         existing_df = pd.read_csv(
             'Q_A_File', encoding='utf-8', na_values=['None'])
         new_data = {'Question': [finalQuestion], 'Answer': [
@@ -580,6 +570,13 @@ class Linkedin:
         updated_df = pd.concat([existing_df, new_df], ignore_index=True)
         # Corrected file extension to '.csv'
         updated_df.to_csv('Q_A_File', index=False)
+
+    def find_answer_from_csv(self, questions_and_answers, question):
+        for question_csv_kay, element in questions_and_answers.items():
+            split_ans = question_csv_kay.split('-')
+            if all(part.lower() in question.lower() for part in split_ans):
+                return element['Answer']
+        return None
 
     def isUrlExist(self, jobUrl):
         job_urls_file = 'job_urls.txt'
@@ -614,10 +611,11 @@ class Linkedin:
             All_data = pd.read_csv('Q_A_File', encoding='utf-8',
                                    na_values=['None'])
             data = All_data[All_data['FieldType'] == FieldType]
-            questions = data['Question'].tolist()
-            answers = data['Answer'].tolist()
-            FieldType = data['FieldType'].tolist()
-            return dict(zip(questions, answers, FieldType))
+            question_answer_tuples = list(zip(data['Question'].tolist(
+            ), data['Answer'].tolist(), data['FieldType'].tolist()))
+            questions_and_answers = dict((question, {'Answer': answer, 'FieldType': fieldType})
+                                         for question, answer, fieldType in question_answer_tuples)
+            return questions_and_answers
         except FileNotFoundError:
             return {}
 
@@ -626,10 +624,10 @@ class Linkedin:
             All_data = pd.read_csv('Q_A_File', encoding='utf-8',
                                    na_values=['None'])
             data = All_data[All_data['FieldType'] == 3]
-            grouped_data = data.groupby(
-                'Question')['Answer'].apply(list).reset_index()
-            questions_and_answers = dict(
-                zip(grouped_data['Question'], grouped_data['Answer']))
+            question_answer_tuples = list(zip(data['Question'].tolist(
+            ), data['Answer'].tolist(), data['FieldType'].tolist()))
+            questions_and_answers = dict((question, {'Answer': answer, 'FieldType': fieldType})
+                                         for question, answer, fieldType in question_answer_tuples)
             return questions_and_answers
         except FileNotFoundError:
             return {}

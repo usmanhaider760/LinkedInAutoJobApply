@@ -35,58 +35,89 @@ class AnotherClass:
         self.driver = webdriver.Chrome(service=ChromeService(
             ChromeDriverManager().install()), options=utils.chromeBrowserOptions())
 
-        self.driver.get(
-            "https://www.linkedin.com/login?trk=guest_homepage-basic_nav-header-signin")
 
-        try:
-            try:
-                self.driver.find_element(
-                    "id", "username").send_keys(credentials.email)
-            except:
-                pass
-            # time.sleep(2)
-            try:
-                self.driver.find_element(
-                    "id", "password").send_keys(credentials.password)
-            except:
-                pass
-            # time.sleep(2)
-            try:
-                self.click_using_mouse_move(self.driver.find_element(
-                    "xpath", '//button[@type="submit"]'))
-            except:
-                pass
-            time.sleep(10)
-        except:
-            utils.prRed(
-                "                           ❌ Couldn't log in Linkedin by using Chrome. Please check your Linkedin credentials on config files line 7 and 8.")
+def read_questions_and_answers(FieldType):
+    # FieldType TextBox=1,Radio=2,Dropdown=3
+    try:
+        All_data = pd.read_csv('Q_A_File', encoding='utf-8',
+                               na_values=['None'])
+        data = All_data[All_data['FieldType'] == FieldType]
+        question_answer_tuples = list(zip(data['Question'].tolist(
+        ), data['Answer'].tolist(), data['FieldType'].tolist()))
+        questions_and_answers = dict((question, {'Answer': answer, 'FieldType': fieldType})
+                                     for question, answer, fieldType in question_answer_tuples)
+        return questions_and_answers
+    except Exception as e:
+        print(e)
+        return {}
 
-    def perform_connection_request(self):
-        # Create an instance of the ConnectionRequest class
-        urls_to_process = [
-            'https://www.linkedin.com/in/julieta-rodriguez-conte-25914a97/',
-            'https://www.linkedin.com/in/herreraecarolina/',
-            'https://www.linkedin.com/in/romina-sanchez-7aa550244/',
-            'https://www.linkedin.com/in/mubasher-k-l-i-o-n-96b77087/',
-            'https://www.linkedin.com/in/lorena-benitez-128a3345/',
-            'https://www.linkedin.com/in/natalia-arenas-838b811a7/',
-            'https://www.linkedin.com/in/veroderosa/',
-            'https://www.linkedin.com/in/niahblackman/',
-            'https://www.linkedin.com/in/chrissykane/',
-            'https://www.linkedin.com/in/nicholekanter/',
-            'https://www.linkedin.com/in/treywashington/'
-        ]
-        connection_request_instance = ConnectionRequest(self.driver)
-        for url in urls_to_process:
-            self.driver.get(url)
-            time.sleep(random.uniform(2, 3))
-            connection_request_instance.find_follow_and_connect()
 
-        # Optionally, you can close the webdriver when done
-        self.driver.quit()
+def read_questions_and_answers_GroupBy():
+    try:
+        All_data = pd.read_csv('Q_A_File', encoding='utf-8',
+                               na_values=['None'])
+        data = All_data[All_data['FieldType'] == 3]
+        grouped_data = data.groupby('Question').agg({
+            'Answer': list,
+            'FieldType': 'first'
+        }).reset_index()
+        questions_and_answers = dict(zip(grouped_data['Question'], zip(
+            grouped_data['Answer'], grouped_data['FieldType'])))
+        return questions_and_answers
+    except Exception as e:
+        print(e)
+        return {}
+
+
+def answer_Not_Found(question, FieldType, question_element=None):
+    lang = detect(question)
+    if lang != 'en':
+        translator = Translator()
+        translation = translator.translate(question, dest='en')
+        translated_word = translation.text
+    else:
+        # If the language is already English, use the original question
+        translated_word = question
+
+    questionText = 'Question in English\n' + translated_word
+    if translated_word != question:
+        questionText = questionText + '\nQuestion in Other Language\n' + question
+    _input = questionText + '\n'
+    user_input = input(f"\033[92m{_input}\033[00m")
+    processed_output = f"{user_input}"
+
+    separated_values = processed_output.split(',')
+
+    finalQuestion = separated_values[0]
+    finalAns = separated_values[1]
+    existing_df = pd.read_csv(
+        'Q_A_File', encoding='utf-8', na_values=['None'])
+    new_data = {'Question': [finalQuestion], 'Answer': [
+        finalAns], 'FieldType': [FieldType]}
+    new_df = pd.DataFrame(new_data)
+    updated_df = pd.concat([existing_df, new_df], ignore_index=True)
+    # Corrected file extension to '.csv'
+    updated_df.to_csv('Q_A_File', index=False)
 
 
 # Example usage
 if __name__ == "__main__":
-    another_class_instance = AnotherClass()
-    another_class_instance.perform_connection_request()
+    questions_and_answers1 = read_questions_and_answers(1)
+    if 'C++' in questions_and_answers1:
+        print(questions_and_answers1['C++']['Answer'])
+    else:
+        print('false')
+    questions_and_answers2 = read_questions_and_answers(2)
+
+    for question_csv_kay, element in questions_and_answers2.items():
+        split_ans = question_csv_kay.split('-')
+        if all(part in 'What are your salary expectations please?' for part in split_ans):
+            matching_element = element['Answer']
+            print(matching_element)
+            break
+        else:
+            print('false')
+
+    questions_and_answers = read_questions_and_answers_GroupBy()
+
+    answer_Not_Found("Are you single", 2)

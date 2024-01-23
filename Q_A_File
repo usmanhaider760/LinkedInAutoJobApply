@@ -1,2 +1,182 @@
 Question,Answer,FieldType
+TextBox=1,Radio=2,Dropdown=3
 C++,10,1
+sponsorship-visa,No,2
+single,Yes,2
+single,Yes,3
+expectations-salary,2000,2
+remote,Yes,2
+Ruby-Rails,1,1
+Payment-Systems,3,1
+salary-expectation,2000,1
+React,3,1
+Software-Development,13,1
+clear progression-Promotions,Yes,3
+Have you been outside of the UK for a period of more than 28 consecutive days in the last 5 years,Yes,3
+
+
+
+
+C++,10,1
+TensorFlow,10,1
+education-Bachelor,Yes,3
+X++10,1
+Microsoft Dynamics 365,5,3
+onsite-setting,Yes,3
+MERN Stack,10,1
+English,Professional,3
+React.js,2,1
+C#,10,1
+Microsoft Azure,5,1
+MongoDB,2,1
+NoSQL,2,1
+Databases,10,1
+legally-authorized-work,Yes,1
+willing-check-local-law-regulations",Yes,1
+Microsoft Azure-Certifications,No,1
+Engineering-experience,11,1
+BrightSign-rogramming-experience,0,1
+Programming-experience,10,1
+Programming Languages,10,1
+Skill Development,11,1
+Graph Algorithms,2,1
+Visual Basic,5,1
+.NET Core,4,1
+Visual Studio,12,1
+SharePoint,1,1
+Model Driven Development,10,1
+Dataverse,1,1
+Power Automate,2,1
+Power Apps,2,1
+Aspiración Salarial,2000,1
+Git,7,1
+Amazon Web Services-AWS,6,1
+Agile Methodologies,3,1
+Sitecore,1,1
+Continuous Integration and Continuous Delivery (CI/CD),1,1
+Site Reliability Engineering,5,1
+DevOps,1,1
+Are you comfortable commuting to this job's location,Yes,2
+hybrid setting,Yes,2
+Rust,1,1
+open-source projects,1
+What is your level of proficiency in German,
+Python (Programming Language),2
+Java,1
+CPU design,0
+LLVM,0
+Android,3
+iOS Development,1
+Do you have experience with cross-platform mobile development,5
+Are you currently legally authorised to work in Germany or Europe,Yes
+Do you have experience using native iOS and native Android,No
+Have you got experience with B2B SDKs,Yes
+Salary Expectations,2000
+Notice Period,0
+"We would require you to be based in Germany. Are you based in Germany, or willing to relocate to Germany",Yes
+Have you conducted network tracing and engaged in low-level network debugging using tools such as Wireshark,Yes
+Are you familiar with PCAP files and adept at utilizing tracing tools like Jaeger or Sentry,Yes
+"Have you gained experience in handling low-level audio streams, such as building a recording solution capable of receiving audio streams and generating WAVE files",Yes
+"Have you worked on transcoding audio in real-time, or dealt with protocols like WebRTC for streaming audio between backend applications",Yes
+Production Management,10
+Automation,10
+Wie viele Jahre Erfahrung haben Sie mit: Sharepoint Framework (SPFx),2
+Wie viele Jahre Erfahrung haben Sie mit: SharePoint,Gut
+Wie viele Jahre Erfahrung haben Sie mit: Microsoft 365,1
+Wie gut beherrschen Sie Deutsch,Gut
+How many years of experience do you have with Manufacturing Production Scheduling solutions,2
+in back end development,10
+ogrammiersprache),0
+Wie viele Jahre Erfahrung haben Sie mit: Perl,0
+"Wie viele Jahre Erfahrung haben Sie in einer vernetzten Windows-Enterprise-Umgebung gesammelt, in der Sie Schwachstellenbehebungen unterstützt haben",1
+Wie viele Jahre Erfahrung (einschließlich Ausbildung) haben Sie mit Programmierung,1
+Verfügen Sie über Erfahrung und Kenntnisse in der sicheren Konfiguration von Systemen und Servern,1
+Software Development,10
+Data Engineering,1
+This position is for European-based candidates only. Are you based in Europe and eligible to work there,Yes
+Salesforce.com,1
+Do you have experience with Experience cloud and B2B commerce cloud ,Yes
+BMC Helix ITSM,0
+CMDB,0
+Do you have a valid work permit for the EU,Yes
+"Do you currently or plan to permanently reside within France, Germany or Belgium",Yes
+What are your salary expectations,2000
+What is your level of proficiency in French,
+Years of experience in Technical Project Manager,6
+Years of experience in Software Development,Yes
+Years of experience in Oil & Gas Industry,0
+"Are you able to work from client site (Paris, France) for everyday",Yes
+C#,10
+Angular,5
+What is your minimum yearly salary (ie: gross yearly in EUR),24000
+Blockchain,1
+Hyperledger,0
+Wie viele Jahre Erfahrung haben Sie mit: TypeScript,Gut
+Wie viele Jahre Erfahrung haben Sie mit: React.js,2
+Wie viele Jahre Erfahrung haben Sie mit: Node.js,2
+Seit welchem Jahr entwickelt devowl.io WordPress-Plugins,2
+Linux,1
+Rust (Programming Language),1
+Do you have experience with Nix or NixOS,No
+Full-Stack Development,5
+JavaScript Frameworks,5
+Node.js,2
+Are you legally authorized to work in United Kingdom,Yes
+Are you able to fulfil work place policy requirements,Yes
+Do you have experience building low-latency systems from scratch using either C# or Java,Yes
+Do these systems see 1000 messages a second in volume and is sub millisecond,Yes
+Do you have recent commercial experience with multi-threading ,Yes
+Do you have a 2:1 or 1st from a Russell Group University,No
+.NET MAUI,5
+Have you managed Technical Teams of more than 8-10 people,Yes
+TypeScript,5
+Microservices,5
+What's your expected monthly salary,2000
+Quanti anni di esperienza di lavoro hai con .NET,10
+Quanti anni di esperienza di lavoro hai con C#,10
+Architecture Analysis,2
+Application Infrastructure,3
+What is your level of proficiency in Italian,No
+¿Cuántos años de experiencia tienes con .NET Framework,10
+¿Cuántos años de experiencia tienes con .NET in Azure,2
+Quali sono le tue aspettative salariali,2000
+Are you eligible/comfortable with obtaining SC Clearance,Yes
+Are you either a Full Stack (C#/React) Developer or Mobile Developer with strong Maui experience,Yes
+How many years of Software Development experience do you currently have,10
+What are your salary expectations Please enter the gross annual salary here.,26000
+Have you been outside of the UK for a period of more than 28 consecutive days in the last 5 years,Yes
+Unity,1
+Mobile Game Development,1
+Quanti anni di esperienza di lavoro hai con .NET Core,5
+Quanti anni di esperienza di lavoro hai con .NET Core,6
+Qual è il tuo grado di conoscenza della lingua Inglese,Professionale
+Qual è il tuo grado di conoscenza della lingua Inglese,Professional
+Italiano,Nessuno,3
+Russian,0,1
+Do-Russian,No,1
+Do-Russian,No,2
+Do-Russian,No,2,2
+Game Development,1,1
+JavaScript,5,1
+HTML,3,1
+Cascading Style Sheets-CSS,5,1
+Clojure,0,1
+VueJS,1,1
+VueJS,Yes,3
+VueJS,Yes,2
+ASP.NET,7,1
+Angular,5,1
+jQuery,5,1
+AJAX,5,1
+smart contract development-Solidity,2,1
+Layer 1 Blockchain Networks as an Engineer ,Yes,3
+Blockchain Networks,Yes,2
+Developer-Relations-Engineer,Yes,2
+Cloud Application Development,10,1
+PostgreSQL,2,1
+Apache,2,1
+salary-expectation-EUR-hour for B2B contract,20,1
+salary-RON month,5000,1
+Next.js,1,1
+Back-End Web Development,10,1
+Supabase,1,1
