@@ -215,8 +215,8 @@ class Linkedin:
                                             self.chooseResume()
                                             lineToWrite = "🥵 Cannot apply to this Job! " \
                                                 + str(offerPage)
-                                            self.check_and_update_job_link_csv(
-                                                offerPage, self.csv_link_job_file, False)
+                                            # self.check_and_update_job_link_csv(
+                                            #     offerPage, self.csv_link_job_file, False)
                                             self.displayWriteResults(
                                                 lineToWrite)
                                 else:
@@ -625,8 +625,9 @@ class Linkedin:
             questions_and_answers = dict((question, {'Answer': answer, 'FieldType': fieldType})
                                          for question, answer, fieldType in question_answer_tuples)
             return questions_and_answers
-        except FileNotFoundError:
-            return {}
+        except Exception as e:
+            utils.prRed("❌ Error in Selection: " + str(e))
+            return False
 
     def read_questions_and_answers_GroupBy(self):
         try:
