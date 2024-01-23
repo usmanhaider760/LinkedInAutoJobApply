@@ -145,14 +145,14 @@ class Linkedin:
                     self.driver.get(url)
                     time.sleep(random.uniform(1, constants.botSpeed))
                     offersPerPage = []
-                    offersPerPageFilter = self.driver.find_elements(
+                    offersPerPage = self.driver.find_elements(
                         By.XPATH, '//li[@data-occludable-job-id]')
-                    for li_element in offersPerPageFilter:
-                        try:
-                            li_element.find_element(
-                                By.XPATH, './/span[contains(text(), "Applied")]')
-                        except NoSuchElementException:
-                            offersPerPage.append(li_element)
+                    # for li_element in offersPerPageFilter:
+                    #     try:
+                    #         li_element.find_element(
+                    #             By.XPATH, './/span[contains(text(), "Applied")]')
+                    #     except NoSuchElementException:
+                    #         offersPerPage.append(li_element)
                     offerIds = [(offer.get_attribute(
                         "data-occludable-job-id").split(":")[-1]) for offer in offersPerPage]
                     time.sleep(random.uniform(1, constants.botSpeed))
@@ -352,11 +352,17 @@ class Linkedin:
             Additional_Questions = self.driver.find_element(
                 By.XPATH, "html/body/div[3]/div/div/div[2]/div/div[2]/form/div/div/h3")
             lang = detect(Additional_Questions.text)
+            translated_word = Additional_Questions.text
             if lang != 'en':
                 translator = Translator()
-                translation = translator.translate(
-                    Additional_Questions.text, dest='en')
-                translated_word = translation.text
+                try:
+                    translation = translator.translate(
+                        Additional_Questions.text, dest='en')
+                    translated_word = translation.text
+                except Exception as e:
+                    print(e)
+                    pass
+                
             if (' Questions'.lower() in translated_word.lower()) or 'Additional'.lower() in translated_word.lower():
                 if not os.path.exists('Q_A_File'):
                     pd.DataFrame(columns=['Question', 'Answer']).to_csv(
@@ -564,8 +570,11 @@ class Linkedin:
         finalAns = separated_values[1]
         existing_df = pd.read_csv(
             'Q_A_File', encoding='utf-8', na_values=['None'])
+
+       
         new_data = {'Question': [finalQuestion], 'Answer': [
             finalAns], 'FieldType': [FieldType]}
+
         new_df = pd.DataFrame(new_data)
         updated_df = pd.concat([existing_df, new_df], ignore_index=True)
         # Corrected file extension to '.csv'
